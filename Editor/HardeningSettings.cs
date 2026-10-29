@@ -59,6 +59,9 @@ namespace MemphisGameDev.Hardening.Editor
         [Tooltip("The generated per-build watermark marker C#, written into the game's Assets.")]
         public string watermarkGeneratedPath = "Assets/Scripts/Multiplayer/Core/BuildWatermark.Generated.cs";
 
+        [Tooltip("Namespace of the game's BuildWatermark partial class. Must match the game's own BuildWatermark.cs, since both partials compile into the game assembly.")]
+        public string watermarkClassNamespace = "HardenedGame";
+
         [Tooltip("The log of watermarked releases (version<TAB>first verified), in the game's Assets.")]
         public string watermarkReleasesPath = "Assets/Scripts/Multiplayer/Editor/Watermark/WatermarkReleases.txt";
 
