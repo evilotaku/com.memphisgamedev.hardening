@@ -4,7 +4,7 @@ using System.Text;
 using UnityEditor;
 using UnityEngine;
 
-namespace MarketShopandRetailSystem.Multiplayer.EditorTools
+namespace MemphisGameDev.Hardening.Editor
 {
     /// <summary>
     /// Keys for the LAN licence (see LanLicence). One ECDSA P-256 key pair lives in the user environment variable

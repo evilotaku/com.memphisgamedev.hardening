@@ -9,7 +9,7 @@ using Unity.Services.CloudCode;
 using Unity.Services.RemoteConfig;
 using UnityEngine;
 
-namespace MarketShopandRetailSystem.Multiplayer
+namespace MemphisGameDev.Hardening
 {
     /// <summary>
     /// Server-driven binary integrity check. It hashes the shipped binaries (via the obfuscated native core

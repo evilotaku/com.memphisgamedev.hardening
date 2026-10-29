@@ -2,7 +2,7 @@ using System;
 using UnityEditor;
 using UnityEngine;
 
-namespace MarketShopandRetailSystem.Multiplayer.EditorTools
+namespace MemphisGameDev.Hardening.Editor
 {
     public enum IntegrityStoreMode
     {

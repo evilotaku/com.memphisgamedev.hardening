@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
 
-namespace MarketShopandRetailSystem.Multiplayer.EditorTools
+namespace MemphisGameDev.Hardening.Editor
 {
     /// <summary>
     /// FNV-1a-64 over whole files, identical to the native core (ssc_hash_region), the runtime

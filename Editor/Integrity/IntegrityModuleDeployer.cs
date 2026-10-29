@@ -10,7 +10,7 @@ using Debug = UnityEngine.Debug;
 using Application = UnityEngine.Application;
 using RuntimePlatform = UnityEngine.RuntimePlatform;
 
-namespace MarketShopandRetailSystem.Multiplayer.EditorTools
+namespace MemphisGameDev.Hardening.Editor
 {
     /// <summary>
     /// CSharpModule mode, opt-in: publishes the IntegrityModule to UGS HEADLESS via the `ugs` CLI, so it

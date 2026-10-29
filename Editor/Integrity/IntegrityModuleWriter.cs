@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 using UnityEditor;
 using UnityEngine;
 
-namespace MarketShopandRetailSystem.Multiplayer.EditorTools
+namespace MemphisGameDev.Hardening.Editor
 {
     /// <summary>
     /// CSharpModule mode: bakes the expected digests into the Cloud Code module source so they ship

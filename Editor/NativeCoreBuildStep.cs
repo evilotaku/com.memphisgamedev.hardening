@@ -9,7 +9,7 @@ using UnityEditor.Build.Reporting;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
-namespace MarketShopandRetailSystem.Multiplayer.EditorTools
+namespace MemphisGameDev.Hardening.Editor
 {
     /// <summary>
     /// Build-time automation for the obfuscated native core (shopsim_core.dll).

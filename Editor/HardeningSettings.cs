@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace MarketShopandRetailSystem.Multiplayer.EditorTools
+namespace MemphisGameDev.Hardening.Editor
 {
     /// <summary>
     /// Per-project configuration for the build-hardening pipeline: the names and locations of the binaries the
@@ -47,10 +47,10 @@ namespace MarketShopandRetailSystem.Multiplayer.EditorTools
 
         [Header("Environment variables (names only; values are never stored here)")]
         [Tooltip("Holds the per-build watermark HMAC secret.")]
-        public string watermarkSecretVar = "SHOPSIM_WATERMARK_SECRET";
+        public string watermarkSecretVar = "HARDENING_WATERMARK_SECRET";
 
         [Tooltip("Holds the LAN licence signing key (base64 P-256 X||Y||D).")]
-        public string licenceKeyVar = "SHOPSIM_LICENCE_KEY";
+        public string licenceKeyVar = "HARDENING_LICENCE_KEY";
 
         [Header("Generated sources")]
         [Tooltip("The expected-digests C# the packager reads and the server validates against.")]

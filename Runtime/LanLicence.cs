@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Unity.Services.CloudCode;
 using UnityEngine;
 
-namespace MarketShopandRetailSystem.Multiplayer
+namespace MemphisGameDev.Hardening
 {
     /// <summary>
     /// LAN play licence. Online sessions are policed by the integrity check (IntegrityGuard), but a LAN session has no

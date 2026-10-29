@@ -5,7 +5,7 @@
 
 using System.Threading.Tasks;
 using UnityEngine;
-using MarketShopandRetailSystem.Multiplayer; // IHardenedSession, HardenedSession, IntegrityGuard, LanLicence
+using MemphisGameDev.Hardening; // IHardenedSession, HardenedSession, IntegrityGuard, LanLicence
 
 namespace HardeningExample
 {

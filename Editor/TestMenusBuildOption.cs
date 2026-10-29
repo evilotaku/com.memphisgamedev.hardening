@@ -4,7 +4,7 @@ using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
 
-namespace MarketShopandRetailSystem.Multiplayer.EditorTools
+namespace MemphisGameDev.Hardening.Editor
 {
     /// <summary>
     /// Tools &gt; Builds &gt; Include Test Menus: adds or removes the SHOPSIM_TEST_MENUS define on Standalone, which compiles

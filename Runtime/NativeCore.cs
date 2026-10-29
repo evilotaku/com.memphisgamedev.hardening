@@ -1,4 +1,4 @@
-namespace MarketShopandRetailSystem.Multiplayer
+namespace MemphisGameDev.Hardening
 {
     /// <summary>
     /// The native-core operations the hardening runtime (<see cref="IntegrityGuard"/>, <see cref="LanLicence"/>) needs:

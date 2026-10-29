@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace MarketShopandRetailSystem.Multiplayer
+namespace MemphisGameDev.Hardening
 {
     /// <summary>
     /// The runtime counterpart to the Editor-only <c>HardeningSettings</c> asset: the shipped binary names and the

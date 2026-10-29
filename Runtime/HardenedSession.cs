@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace MarketShopandRetailSystem.Multiplayer
+namespace MemphisGameDev.Hardening
 {
     /// <summary>
     /// The integration surface the hardening runtime (<see cref="IntegrityGuard"/>, <see cref="LanLicence"/>) uses to

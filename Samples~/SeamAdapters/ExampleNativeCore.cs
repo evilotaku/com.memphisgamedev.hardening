@@ -11,7 +11,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Text;
 using UnityEngine;
-using MarketShopandRetailSystem.Multiplayer; // INativeCore, NativeCore (the package Runtime assembly)
+using MemphisGameDev.Hardening; // INativeCore, NativeCore (the package Runtime assembly)
 
 namespace HardeningExample
 {
