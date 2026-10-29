@@ -1,0 +1,33 @@
+{
+  "name": "com.memphisgamedev.hardening",
+  "version": "0.1.0",
+  "displayName": "MemphisGameDev Hardening",
+  "description": "Build-hardening pipeline for shipping Unity games: ship packaging from an allowlist, build hygiene, integrity digests, a per-build watermark, and test-menu/demo build guards. Game-specific values (binary names, environment-variable names, native paths) are configured per project through a HardeningSettings asset. Embedded here while it is still being extracted from Multiplayer Shop Sim; will move to its own repository later.",
+  "unity": "6000.0",
+  "author": {
+    "name": "Memphis Game Dev"
+  },
+  "dependencies": {
+    "com.unity.services.authentication": "3.7.4",
+    "com.unity.services.cloudcode": "3.1.0-exp.1",
+    "com.unity.remote-config": "4.2.5",
+    "com.unity.nuget.newtonsoft-json": "3.2.2"
+  },
+  "samples": [
+    {
+      "displayName": "Seam adapters",
+      "description": "Reference INativeCore and IHardenedSession implementations (Shop Sim's own adapters) showing how a game registers the seams and drives IntegrityGuard/LanLicence.",
+      "path": "Samples~/SeamAdapters"
+    },
+    {
+      "displayName": "Integrity Cloud Code module",
+      "description": "The server-side UGS Cloud Code module (challenge, validate, verify-pass, issue-licence) the editor tooling generates and deploys. Excludes generated keys and per-build digests.",
+      "path": "Samples~/CloudCodeModule"
+    },
+    {
+      "displayName": "Obfuscated native core",
+      "description": "The native core C++ source and xollvm build script that back INativeCore. Excludes the generated secret headers and intermediate IR.",
+      "path": "Samples~/NativeCore"
+    }
+  ]
+}

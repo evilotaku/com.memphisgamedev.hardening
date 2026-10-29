@@ -1,0 +1,204 @@
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using Newtonsoft.Json;
+using UnityEditor;
+using UnityEngine;
+
+namespace MarketShopandRetailSystem.Multiplayer.EditorTools
+{
+    /// <summary>
+    /// CSharpModule mode: bakes the expected digests into the Cloud Code module source so they ship
+    /// inside the server module (never exposed to clients, no runtime service read). Keeps a JSON
+    /// sidecar next to ExpectedDigests.cs so digests accumulate across builds, then regenerates the
+    /// .cs from it. The module is the in-project IntegrityModule.ccmu (Editor-only Cloud assembly,
+    /// compiled by Unity at C# 9, so generated sources use block namespaces). It is picked up on the
+    /// next Deployment-window deploy.
+    /// </summary>
+    public static class IntegrityModuleWriter
+    {
+        public static void Write(IntegrityUploadSettings settings, IntegrityManifest manifest)
+        {
+            string projectRoot = Directory.GetParent(Application.dataPath).FullName;
+            string csPath = Path.Combine(projectRoot, settings.moduleExpectedDigestsFile);
+            string dir = Path.GetDirectoryName(csPath);
+            if (dir == null || !Directory.Exists(dir))
+            {
+                Debug.LogWarning($"[Integrity] Module path not found: {csPath}. Is the IntegrityModule scaffolded? Skipping.");
+                return;
+            }
+            string jsonPath = Path.Combine(dir, "expected-digests.json");
+
+            // Load + merge the accumulated map.
+            var map = File.Exists(jsonPath)
+                ? JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(File.ReadAllText(jsonPath))
+                  ?? new Dictionary<string, Dictionary<string, string>>()
+                : new Dictionary<string, Dictionary<string, string>>();
+
+            if (!map.TryGetValue(manifest.buildId, out var build))
+            {
+                build = new Dictionary<string, string>();
+                map[manifest.buildId] = build;
+            }
+            foreach (var e in manifest.hashes) build[e.target] = e.hash;
+
+            // Chunk tables live in their own sidecar: they are large, and builds from before they existed have none.
+            string chunksPath = Path.Combine(dir, "expected-chunks.json");
+            var chunks = LoadMap(chunksPath);
+            var buildChunks = new Dictionary<string, string>();
+            foreach (var e in manifest.hashes)
+            {
+                if (!string.IsNullOrEmpty(e.chunks)) buildChunks[e.target] = e.chunks;
+            }
+            // Replaced whole, never merged: a stale table for one target would fail every check of this build.
+            if (buildChunks.Count > 0) chunks[manifest.buildId] = buildChunks;
+            else chunks.Remove(manifest.buildId);
+
+            File.WriteAllText(jsonPath, JsonConvert.SerializeObject(map, Formatting.Indented));
+            File.WriteAllText(chunksPath, JsonConvert.SerializeObject(chunks, Formatting.Indented));
+            File.WriteAllText(csPath, Emit(settings.moduleNamespace, map, chunks));
+            ImportIfInAssets(projectRoot, csPath);
+            Debug.Log($"[Integrity] Baked {map.Count} build(s) into {settings.moduleExpectedDigestsFile}. " +
+                      "Deploy the IntegrityModule (Services ▸ Deployment) to publish.");
+        }
+
+        private static Dictionary<string, Dictionary<string, string>> LoadMap(string jsonPath)
+        {
+            return File.Exists(jsonPath)
+                ? JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(File.ReadAllText(jsonPath))
+                  ?? new Dictionary<string, Dictionary<string, string>>()
+                : new Dictionary<string, Dictionary<string, string>>();
+        }
+
+        /// <summary>Regenerates ExpectedDigests.cs from the sidecars without a build (e.g. after changing its shape).</summary>
+        [MenuItem("Tools/Builds/Integrity/Regenerate Expected Digests Source")]
+        public static void Regenerate()
+        {
+            var settings = IntegrityUploadSettings.Find();
+            if (settings == null) return;
+            string projectRoot = Directory.GetParent(Application.dataPath).FullName;
+            string csPath = Path.Combine(projectRoot, settings.moduleExpectedDigestsFile);
+            string dir = Path.GetDirectoryName(csPath);
+            if (dir == null || !Directory.Exists(dir)) return;
+            File.WriteAllText(csPath, Emit(settings.moduleNamespace,
+                LoadMap(Path.Combine(dir, "expected-digests.json")), LoadMap(Path.Combine(dir, "expected-chunks.json"))));
+            ImportIfInAssets(projectRoot, csPath);
+        }
+
+        private static string Emit(string ns, Dictionary<string, Dictionary<string, string>> map,
+            Dictionary<string, Dictionary<string, string>> chunks)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("// <auto-generated>");
+            sb.AppendLine("// Expected FNV-1a-64 digests per build, baked into the server module.");
+            sb.AppendLine("// Regenerated on every Standalone build by IntegrityBuildPostprocessor. Do NOT hand-edit.");
+            sb.AppendLine("// </auto-generated>");
+            sb.AppendLine("using System.Collections.Generic;");
+            sb.AppendLine();
+            sb.AppendLine($"namespace {ns}");
+            sb.AppendLine("{");
+            sb.AppendLine("    public static class ExpectedDigests");
+            sb.AppendLine("    {");
+            sb.AppendLine("        public static readonly Dictionary<string, Dictionary<string, string>> Map =");
+            sb.AppendLine("            new Dictionary<string, Dictionary<string, string>>");
+            sb.AppendLine("            {");
+            AppendMap(sb, map);
+            sb.AppendLine();
+            sb.AppendLine("        /// <summary>Per build and target: \"length:base64(chunk digests)\", answered by ChallengeDigest.</summary>");
+            sb.AppendLine("        public static readonly Dictionary<string, Dictionary<string, string>> Chunks =");
+            sb.AppendLine("            new Dictionary<string, Dictionary<string, string>>");
+            sb.AppendLine("            {");
+            AppendMap(sb, chunks);
+            sb.AppendLine("    }");
+            sb.AppendLine("}");
+            return sb.ToString();
+        }
+
+        private static void AppendMap(StringBuilder sb, Dictionary<string, Dictionary<string, string>> map)
+        {
+            foreach (var build in map)
+            {
+                sb.AppendLine($"                [{Quote(build.Key)}] = new Dictionary<string, string>");
+                sb.AppendLine("                {");
+                foreach (var e in build.Value)
+                    sb.AppendLine($"                    [{Quote(e.Key)}] = {Quote(e.Value)},");
+                sb.AppendLine("                },");
+            }
+            sb.AppendLine("            };");
+        }
+
+        private static string Quote(string s) => "\"" + (s ?? "").Replace("\\", "\\\\").Replace("\"", "\\\"") + "\"";
+
+        /// <summary>The module sources live under Assets/, so newly written ones must be imported to compile.</summary>
+        private static void ImportIfInAssets(string projectRoot, string fullPath)
+        {
+            string rel = Path.GetRelativePath(projectRoot, fullPath).Replace('\\', '/');
+            if (rel.StartsWith("Assets/")) AssetDatabase.ImportAsset(rel);
+        }
+
+        // ---------------------------------------------------------------- pass signing key
+
+        private const string DefaultModuleDir = "Assets/CloudCode/IntegrityModule/Cloud";
+        private const string PassKeyFile = "PassKey.Generated.cs";
+
+        /// <summary>
+        /// The module signs integrity passes with a key in PassKey.Generated.cs (the other half of the
+        /// committed partial PassKey.cs). The file is git-ignored (the key must never reach clients or the
+        /// repo), so it is generated on the first Editor load of a fresh clone. The Cloud assembly is
+        /// Editor-only, so the key never ships in a player. Rotating it invalidates passes in flight;
+        /// redeploy the module afterwards.
+        /// </summary>
+        [InitializeOnLoadMethod]
+        private static void EnsurePassKey()
+        {
+            string path = PassKeyPath();
+            if (path == null || File.Exists(path)) return;
+            WritePassKey(path);
+            // Importing from InitializeOnLoad would recompile mid-reload; defer it.
+            EditorApplication.delayCall += () =>
+                ImportIfInAssets(Directory.GetParent(Application.dataPath).FullName, path);
+        }
+
+        [MenuItem("Tools/Builds/Integrity/Rotate Pass Signing Key")]
+        private static void RotatePassKey()
+        {
+            string path = PassKeyPath();
+            if (path == null) return;
+            WritePassKey(path);
+            ImportIfInAssets(Directory.GetParent(Application.dataPath).FullName, path);
+            Debug.Log("[Integrity] Rotated the pass signing key. Deploy the IntegrityModule (Services ▸ Deployment).");
+        }
+
+        private static string PassKeyPath()
+        {
+            var settings = IntegrityUploadSettings.Find();
+            string projectRoot = Directory.GetParent(Application.dataPath).FullName;
+            string dir = settings != null
+                ? Path.GetDirectoryName(Path.Combine(projectRoot, settings.moduleExpectedDigestsFile))
+                : Path.Combine(projectRoot, DefaultModuleDir);
+            return dir != null && Directory.Exists(dir) ? Path.Combine(dir, PassKeyFile) : null;
+        }
+
+        private static void WritePassKey(string path)
+        {
+            var settings = IntegrityUploadSettings.Find();
+            string ns = settings != null ? settings.moduleNamespace : "IntegrityModule.Cloud";
+            byte[] key = new byte[32];
+            using (var rng = System.Security.Cryptography.RandomNumberGenerator.Create()) rng.GetBytes(key);
+
+            var sb = new StringBuilder();
+            sb.AppendLine("// <auto-generated>");
+            sb.AppendLine("// HMAC key the IntegrityModule signs integrity passes with. Git-ignored: never commit it.");
+            sb.AppendLine("// Generated by IntegrityModuleWriter; rotate via Tools ▸ Builds ▸ Integrity ▸ Rotate Pass Signing Key.");
+            sb.AppendLine("// </auto-generated>");
+            sb.AppendLine($"namespace {ns}");
+            sb.AppendLine("{");
+            sb.AppendLine("    public static partial class PassKey");
+            sb.AppendLine("    {");
+            sb.AppendLine($"        static partial void Load(ref string secret) => secret = {Quote(System.Convert.ToBase64String(key))};");
+            sb.AppendLine("    }");
+            sb.AppendLine("}");
+            File.WriteAllText(path, sb.ToString());
+        }
+    }
+}
