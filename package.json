@@ -1,6 +1,6 @@
 {
   "name": "com.memphisgamedev.hardening",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "displayName": "MemphisGameDev Hardening",
   "description": "Build-hardening pipeline for shipping Unity games: ship packaging from an allowlist, build hygiene, integrity digests, a per-build watermark, and test-menu/demo build guards. Game-specific values (binary names, environment-variable names, native paths) are configured per project through a HardeningSettings asset. The runtime lives behind the INativeCore and IHardenedSession seams a game implements; see Samples for templates.",
   "unity": "6000.0",

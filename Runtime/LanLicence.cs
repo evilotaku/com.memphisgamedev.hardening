@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Unity.Services.CloudCode;
 using UnityEngine;
+using UnityEngine.Scripting;
 
 namespace MemphisGameDev.Hardening
 {
@@ -26,6 +27,7 @@ namespace MemphisGameDev.Hardening
     public static class LanLicence
     {
         [Serializable]
+        [Preserve]
         public class IssueResult
         {
             public bool ok;

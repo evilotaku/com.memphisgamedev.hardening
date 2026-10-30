@@ -8,6 +8,7 @@ using Unity.Services.Authentication;
 using Unity.Services.CloudCode;
 using Unity.Services.RemoteConfig;
 using UnityEngine;
+using UnityEngine.Scripting;
 
 namespace MemphisGameDev.Hardening
 {
@@ -32,6 +33,7 @@ namespace MemphisGameDev.Hardening
         private struct AppAttributes { }
 
         [Serializable]
+        [Preserve]
         public class Result
         {
             public bool ok = true;
@@ -41,12 +43,14 @@ namespace MemphisGameDev.Hardening
         }
 
         [Serializable]
+        [Preserve]
         public class ChallengeResult
         {
             public string challenge = "";
         }
 
         [Serializable]
+        [Preserve]
         public class PassCheck
         {
             public bool valid;
