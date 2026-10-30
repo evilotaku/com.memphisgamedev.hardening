@@ -36,27 +36,27 @@ namespace MemphisGameDev.Hardening
         [Preserve]
         public class Result
         {
-            public bool ok = true;
-            public string action = "";  // "disconnect" acts; anything else is advisory
-            public string reason = "";
-            public string pass = "";    // signed by the module when a host nonce was sent
+            [Preserve] public bool ok = true;
+            [Preserve] public string action = "";  // "disconnect" acts; anything else is advisory
+            [Preserve] public string reason = "";
+            [Preserve] public string pass = "";    // signed by the module when a host nonce was sent
         }
 
         [Serializable]
         [Preserve]
         public class ChallengeResult
         {
-            public string challenge = "";
+            [Preserve] public string challenge = "";
         }
 
         [Serializable]
         [Preserve]
         public class PassCheck
         {
-            public bool valid;
-            public string verdict = "";  // ok, open, unk, missing, bad
-            public string playerId = "";
-            public string reason = "";
+            [Preserve] public bool valid;
+            [Preserve] public string verdict = "";  // ok, open, unk, missing, bad
+            [Preserve] public string playerId = "";
+            [Preserve] public string reason = "";
         }
 
         /// <summary>Check schedule and host policy, from Remote Config (defaults when it is unreachable).</summary>

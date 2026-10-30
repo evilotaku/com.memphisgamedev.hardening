@@ -30,10 +30,10 @@ namespace MemphisGameDev.Hardening
         [Preserve]
         public class IssueResult
         {
-            public bool ok;
-            public string licence = "";
-            public long expires;
-            public string reason = "";
+            [Preserve] public bool ok;
+            [Preserve] public string licence = "";
+            [Preserve] public long expires;
+            [Preserve] public string reason = "";
         }
 
         private const string FileName = "lan_licence.txt";
