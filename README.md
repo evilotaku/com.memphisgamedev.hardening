@@ -10,7 +10,7 @@ runtime sits behind two small seams a game implements, so the package carries no
 Add it to your project's `Packages/manifest.json` (pin to a tag):
 
 ```json
-"com.memphisgamedev.hardening": "https://github.com/evilotaku/com.memphisgamedev.hardening.git#v0.2.1"
+"com.memphisgamedev.hardening": "https://github.com/evilotaku/com.memphisgamedev.hardening.git#v0.2.2"
 ```
 
 It depends on the UGS Authentication, Cloud Code and Remote Config packages (declared in `package.json`,
